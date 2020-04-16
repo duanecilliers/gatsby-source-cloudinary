@@ -15,7 +15,7 @@ const newCloudinary = (options) => {
 }
 
 const getResourceOptions = (options) => {
-  let result = {}
+  const result = {}
 
   DEFAULT_KEYS.forEach(key => {
     if (typeof options[key] !== 'undefined') {
