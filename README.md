@@ -87,5 +87,4 @@ Feel free to create feature requests.... and PRs :)
 
 ## Todo
 - [ ] Add fragments
-- [ ] Update sizes string
 - [ ] Handle Cloudinary pagination, could have more than `maxResults` of 500
