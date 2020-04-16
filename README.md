@@ -86,8 +86,6 @@ All media files sourced from Cloudinary are on build, hence you will need to tri
 Feel free to create feature requests.... and PRs :)
 
 ## Todo
-- [ ] Add transformation args
 - [ ] Add fragments
-- [ ] Add support for fixed and fluid
 - [ ] Update sizes string
-  - [ ] Handle pagination, could have more than `maxResults` of 500
+- [ ] Handle Cloudinary pagination, could have more than `maxResults` of 500

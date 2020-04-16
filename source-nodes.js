@@ -1,11 +1,22 @@
-const fetch = require('node-fetch')
 const { newCloudinary, getResourceOptions } = require('./cloudinary')
 
 const type = 'CloudinaryMedia'
 const imageType = 'CloudinaryMediaImage'
 
 /**
- * @todo document
+ * Get media data for gatsby.createNode
+ *
+ * @param {Object} gatsby Gatsby helpers
+ * @param {Object} media Cloudinary resource
+ * @param {String} media.public_id Public ID
+ * @param {String} media.format Media format EG: 'png'
+ * @param {Number} media.height Media height
+ * @param {Number} media.width Media width
+ * @param {String} media.resouce_type Media resource type EG: 'image', 'video' etc..?
+ * @param {String} media.type Media type EG: 'upload'
+ * @param {String} media.url Media URL
+ * @param {String} media.version version Media version
+ * @param {String} media.bytes Media size in btes
  */
 const getNodeData = (gatsby, media) => {
   return {
@@ -18,64 +29,6 @@ const getNodeData = (gatsby, media) => {
       contentDigest: gatsby.createContentDigest(media)
     }
   }
-}
-
-/**
- * Get data to generate a node for the image
- *
- * @param {Object} gatsby Gatsby actions https://www.gatsbyjs.org/docs/actions
- * @param {string} parent CloudinaryMedia node id
- * @param {Object} image Image fields
- * @param {string} image.aspectRatio Gatsby image aspect ratio
- * @param {string} image.base64 Gatsby image base64
- * @param {string} image.sizes Gatsby image sizes
- * @param {string} image.src Gatsby image src
- * @param {string} image.srcSet Gatsby image srcSet
- */
-const getImageNodeData = (gatsby, parent, id, image) => {
-  return {
-    ...image,
-    id: gatsby.createNodeId(`cloudinary-media-image-${id}`),
-    parent,
-    internal: {
-      type: imageType,
-      content: JSON.stringify(image),
-      contentDigest: gatsby.createContentDigest(image)
-    }
-  }
-}
-
-/**
- * @todo determine image format instead of hardcoding png
- */
-const getBase64 = async (url) => {
-  const res = await fetch(url)
-  if (res.status !== 200) {
-    console.error('Failed to fetch image')
-  }
-  const imageData = await res.buffer()
-  const arrayBuffer = Buffer.from(imageData).toString('base64')
-  return `data:image/png;base64,${arrayBuffer}`
-}
-
-/**
- * @todo document
- */
-const getImage = (
-  imageData,
-  cloudName,
-  transformations = [],
-  defaultTransformations = ['q_auto', 'f_auto']
-) => {
-  const baseUrl = 'https://res.cloudinary.com/'
-  const imagePath = [
-    cloudName,
-    '/image/upload/',
-    [...defaultTransformations, ...transformations].join(','),
-    `/v${imageData.version}/`,
-    imageData.public_id
-  ].join('')
-  return baseUrl + imagePath
 }
 
 module.exports = function sourceNodes (gatsby, options) {
@@ -98,27 +51,31 @@ module.exports = function sourceNodes (gatsby, options) {
     }
 
     result.resources.forEach(async (resource) => {
+
       const nodeData = getNodeData(gatsby, resource)
       await gatsby.actions.createNode(nodeData)
 
-      if (nodeData.resource_type === 'image') {
-        /** @todo use config? */
-        const srcSetWidths = [160, 320, 640, 1280, 2560]
-        const base64Url = getImage(nodeData, cloudName, ['w_30'])
-        const base64 = await getBase64(base64Url)
-        const sizes = `(max-width: ${srcSetWidths.slice(-1)[0]}px) 100vw, ${srcSetWidths.slice(-1)[0]}`
-        const srcSet = srcSetWidths.map(width => getImage(nodeData, cloudName, [`w_${width}`])).join(', ')
+      const { id, public_id, version, height, width } = nodeData
+      const node = gatsby.getNode(id)
 
-        const imageNodeData = getImageNodeData(gatsby, nodeData.id, nodeData.public_id, {
-          aspectRatio: nodeData.width / nodeData.height,
-          base64,
-          sizes,
-          src: nodeData.secure_url,
-          srcSet
-        })
+      if (nodeData.resource_type === 'image') {
+        const imageNodeData = {
+          id: gatsby.createNodeId(`cloudinary-media-image-${id}`),
+          public_id,
+          cloudName,
+          version,
+          parent: id,
+          originalHeight: height,
+          originalWidth: width,
+          breakpoints: [320, 640, 1280, 2560],
+          internal: {
+            type: imageType,
+            contentDigest: gatsby.createContentDigest(gatsby.getNode(id))
+          }
+        }
 
         await gatsby.actions.createNode(imageNodeData)
-        gatsby.actions.createParentChildLink({ parent: nodeData, child: imageNodeData })
+        gatsby.actions.createParentChildLink({ parent: node, child: imageNodeData })
       }
     })
 
