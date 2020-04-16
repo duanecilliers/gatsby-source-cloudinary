@@ -12,7 +12,7 @@ Looking to use the features of Gatsby-Image with Cloudinary optimized storage, t
 Obtain your cloudname, key and secret from your cloudinary console when you signup at [Cloudinary.com](https://cloudinary.com)
 
 Store your `cloudName`, `apiKey` and `apiSecret` as environment variables for security.
-To do this, create a file in the root of the project named `.env`. Add your environment variables in it with: 
+To do this, create a file in the root of the project named `.env`. Add your environment variables in it with:
 
 ```
 CLOUDINARY_API_KEY=INSERT API KEY HERE
@@ -81,6 +81,13 @@ An example `prefix` value is `gatsby-anime-videos/`. This will fetch only media 
 
 > The `f_auto` and `q_auto` Cloudinary transformations are applied automatically to all media queries. This optimizes the delivered media quality and format.
 
-All media files sourced from Cloudinary are on build, hence you will need to trigger a new production build whenever new media files are added directly on Cloudinary. 
+All media files sourced from Cloudinary are on build, hence you will need to trigger a new production build whenever new media files are added directly on Cloudinary.
 
 Feel free to create feature requests.... and PRs :)
+
+## Todo
+- [ ] Add transformation args
+- [ ] Add fragments
+- [ ] Add support for fixed and fluid
+- [ ] Update sizes string
+  - [ ] Handle pagination, could have more than `maxResults` of 500
