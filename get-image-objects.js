@@ -2,7 +2,7 @@ const fetch = require('node-fetch')
 
 const DEFAULT_BASE64_WIDTH = 30
 const DEFAULT_FIXED_WIDTH = 400
-const DEFAULT_FLUID_MAX_WIDTH = 650
+const DEFAULT_FLUID_MAX_WIDTH = 2560
 
 /**
  * @todo determine image format instead of hardcoding png
