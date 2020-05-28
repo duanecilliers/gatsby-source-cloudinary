@@ -137,6 +137,7 @@ exports.getFixedImageObject = async ({
     .join()
 
   return {
+    aspectRatio,
     base64,
     height: width / aspectRatio,
     src,
