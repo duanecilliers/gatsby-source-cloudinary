@@ -1,4 +1,5 @@
 const fetch = require('node-fetch')
+const FileType = require('file-type')
 
 const DEFAULT_BASE64_WIDTH = 30
 const DEFAULT_FIXED_WIDTH = 400
@@ -13,8 +14,9 @@ const getBase64 = async (url) => {
     console.error('Failed to fetch image')
   }
   const imageData = await res.buffer()
+  const fileType = await FileType.fromBuffer(imageData)
   const arrayBuffer = Buffer.from(imageData).toString('base64')
-  return `data:image/pngbase64,${arrayBuffer}`
+  return `data:${fileType.mime};base64,${arrayBuffer}`
 }
 
 const getImageUrl = ({
